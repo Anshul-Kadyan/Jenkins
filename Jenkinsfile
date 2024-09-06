@@ -12,6 +12,18 @@ pipeline {
                 echo 'Running unit and integration tests...'
                 echo 'Using test tools: JUnit (Java), Mocha (Node.js)'
             }
+            post {
+                always {
+                    emailext (
+                        subject: "Unit and Integration Tests Results",
+                        body: "The unit and integration tests have completed. Check the attached logs for details.",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/test-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressAttachments: true
+                    )
+                }
+            }
         }
         stage('Code Analysis') {
             steps {
@@ -23,6 +35,18 @@ pipeline {
             steps {
                 echo 'Performing security scan...'
                 echo 'Using security scan tool: Snyk'
+            }
+            post {
+                always {
+                    emailext (
+                        subject: "Security Scan Results",
+                        body: "The security scan has completed. Check the attached logs for details.",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/security-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressAttachments: true
+                    )
+                }
             }
         }
         stage('Deploy to Staging') {
@@ -46,22 +70,15 @@ pipeline {
     }
     post {
         success {
-            emailext (
-                subject: "Build Success",
-                body: "The build was successful.",
-                to: "work.kadyan@gmail.com"
-            )
+            echo 'Pipeline completed successfully.'
         }
         failure {
-            emailext (
-                subject: "Build Failure",
-                body: "The build failed.",
-                to: "work.kadyan@gmail.com"
-            )
+            echo 'Pipeline failed.'
         }
         always {
-            echo 'Pipeline completed.'
+            echo 'Cleaning up...'
         }
     }
 }
+
 
