@@ -1,117 +1,90 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('* * * * *') // Polls the GitHub repository every minute
+    }
     stages {
         stage('Build') {
             steps {
-                echo 'Building the application...'
-                echo 'Using build tool: Maven'
-                sh 'echo "Build log contents" > build-log.txt'
+                echo 'Stage 1: Build - Building the code using Maven.'
+                echo 'Tool: Maven'
+                // Example: sh 'mvn clean package'
             }
         }
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Running unit and integration tests...'
-                echo 'Using test tools: JUnit (Java), Mocha (Node.js)'
-                sh 'echo "Unit and integration test log contents" > test-log.txt'
+                echo 'Stage 2: Unit and Integration Tests - Running unit and integration tests.'
+                echo 'Tool: JUnit (Java), Mocha (Node.js)'
+                // Example: sh 'mvn test' or 'npm test'
             }
             post {
                 always {
                     archiveArtifacts artifacts: '**/test-logs/*.log', allowEmptyArchive: true
-                }
-                success {
-                    sendEmail(
-                        stageName: 'Unit and Integration Tests',
-                        stageStatus: 'SUCCESS',
-                        attachmentsPattern: '**/test-logs/*.log'
-                    )
-                }
-                failure {
-                    sendEmail(
-                        stageName: 'Unit and Integration Tests',
-                        stageStatus: 'FAILURE',
-                        attachmentsPattern: '**/test-logs/*.log'
+                    emailext (
+                        subject: "Unit and Integration Tests Results: Job ${env.JOB_NAME}",
+                        body: "The unit and integration tests have completed. Check the attached logs for details.\n\nStatus: ${currentBuild.currentResult}\nLink: ${env.BUILD_URL}",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/test-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressLog: true
                     )
                 }
             }
         }
         stage('Code Analysis') {
             steps {
-                echo 'Performing code analysis...'
-                echo 'Using code analysis tool: SonarQube'
-                sh 'echo "Code analysis log contents" > code-analysis-log.txt'
+                echo 'Stage 3: Code Analysis - Analyzing the code with SonarQube.'
+                echo 'Tool: SonarQube'
+                // Example: sh 'sonar-scanner'
             }
         }
         stage('Security Scan') {
             steps {
-                echo 'Performing security scan...'
-                echo 'Using security scan tool: Snyk'
-                sh 'echo "Security scan log contents" > security-scan-log.txt'
+                echo 'Stage 4: Security Scan - Performing a security scan with Snyk.'
+                echo 'Tool: Snyk'
+                // Example: sh 'snyk test'
             }
             post {
                 always {
                     archiveArtifacts artifacts: '**/security-logs/*.log', allowEmptyArchive: true
-                }
-                success {
-                    sendEmail(
-                        stageName: 'Security Scan',
-                        stageStatus: 'SUCCESS',
-                        attachmentsPattern: '**/security-logs/*.log'
-                    )
-                }
-                failure {
-                    sendEmail(
-                        stageName: 'Security Scan',
-                        stageStatus: 'FAILURE',
-                        attachmentsPattern: '**/security-logs/*.log'
+                    emailext (
+                        subject: "Security Scan Results: Job ${env.JOB_NAME}",
+                        body: "The security scan has completed. Check the attached logs for details.\n\nStatus: ${currentBuild.currentResult}\nLink: ${env.BUILD_URL}",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/security-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressLog: true
                     )
                 }
             }
         }
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to staging environment...'
-                echo 'Using deployment tool: AWS CLI'
+                echo 'Stage 5: Deploy to Staging - Deploying the application to a staging server.'
+                echo 'Tool: AWS CLI'
+                // Example: sh 'aws deploy ...'
             }
         }
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Running integration tests on staging environment...'
-                echo 'Using test tools: Selenium, Postman'
+                echo 'Stage 6: Integration Tests on Staging - Running integration tests on staging environment.'
+                echo 'Tool: Selenium, Postman'
+                // Example: sh 'selenium test' or 'postman run ...'
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to production environment...'
-                echo 'Using deployment tool: AWS CLI'
+                echo 'Stage 7: Deploy to Production - Deploying the application to a production server.'
+                echo 'Tool: AWS CLI'
+                // Example: sh 'aws deploy ...'
             }
         }
     }
     post {
         always {
-            archiveArtifacts artifacts: '**/*.txt', onlyIfSuccessful: true
-            emailext (
-                subject: "Jenkins Build Report ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n Link: ${env.BUILD_URL}",
-                to: "work.kadyan@gmail.com",
-                attachmentsPattern: '**/*.txt',
-                replyTo: "work.kadyan@gmail.com",
-                compressLog: true,
-                attachLog: true
-            )
+            echo 'Cleaning up...'
         }
     }
-}
-
-// Helper function to send emails with stage status
-def sendEmail(Map params) {
-    emailext (
-        subject: "Stage ${params.stageName} ${params.stageStatus}: Job ${env.JOB_NAME}",
-        body: "The ${params.stageName} stage has ${params.stageStatus}. Please review the attached logs.\n\nLink: ${env.BUILD_URL}",
-        to: "work.kadyan@gmail.com",
-        attachmentsPattern: params.attachmentsPattern,
-        replyTo: "work.kadyan@gmail.com",
-        compressLog: true
-    )
 }
 
 
