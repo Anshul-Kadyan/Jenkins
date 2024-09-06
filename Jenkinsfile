@@ -19,14 +19,20 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: '**/test-logs/*.log', allowEmptyArchive: true
+                    script {
+                        // Create a report file
+                        sh 'echo "Unit and Integration Tests Status: ${currentBuild.currentResult}" > unit_integration_tests_report.txt'
+                        sh 'echo "Job Name: ${env.JOB_NAME}" >> unit_integration_tests_report.txt'
+                        sh 'echo "Build Number: ${env.BUILD_NUMBER}" >> unit_integration_tests_report.txt'
+                        sh 'echo "Build URL: ${env.BUILD_URL}" >> unit_integration_tests_report.txt'
+                    }
+                    archiveArtifacts artifacts: 'unit_integration_tests_report.txt', onlyIfSuccessful: true
                     emailext (
-                        subject: "Unit and Integration Tests Results: Job ${env.JOB_NAME}",
-                        body: "${currentBuild.currentResult}: Unit and integration tests have completed. Check the attached logs for details.\n\nBuild URL: ${env.BUILD_URL}",
+                        subject: "Unit and Integration Tests Report: ${currentBuild.currentResult} - Job ${env.JOB_NAME}",
+                        body: "Unit and Integration Tests ${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nBuild URL: ${env.BUILD_URL}",
                         to: "work.kadyan@gmail.com",
-                        attachmentsPattern: '**/test-logs/*.log',
-                        replyTo: "work.kadyan@gmail.com",
-                        compressLog: true
+                        attachmentsPattern: 'unit_integration_tests_report.txt',
+                        replyTo: "work.kadyan@gmail.com"
                     )
                 }
             }
@@ -46,14 +52,20 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: '**/security-logs/*.log', allowEmptyArchive: true
+                    script {
+                        // Create a report file
+                        sh 'echo "Security Scan Status: ${currentBuild.currentResult}" > security_scan_report.txt'
+                        sh 'echo "Job Name: ${env.JOB_NAME}" >> security_scan_report.txt'
+                        sh 'echo "Build Number: ${env.BUILD_NUMBER}" >> security_scan_report.txt'
+                        sh 'echo "Build URL: ${env.BUILD_URL}" >> security_scan_report.txt'
+                    }
+                    archiveArtifacts artifacts: 'security_scan_report.txt', onlyIfSuccessful: true
                     emailext (
-                        subject: "Security Scan Results: Job ${env.JOB_NAME}",
-                        body: "${currentBuild.currentResult}: Security scan has completed. Check the attached logs for details.\n\nBuild URL: ${env.BUILD_URL}",
+                        subject: "Security Scan Report: ${currentBuild.currentResult} - Job ${env.JOB_NAME}",
+                        body: "Security Scan ${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nBuild URL: ${env.BUILD_URL}",
                         to: "work.kadyan@gmail.com",
-                        attachmentsPattern: '**/security-logs/*.log',
-                        replyTo: "work.kadyan@gmail.com",
-                        compressLog: true
+                        attachmentsPattern: 'security_scan_report.txt',
+                        replyTo: "work.kadyan@gmail.com"
                     )
                 }
             }
