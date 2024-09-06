@@ -5,7 +5,8 @@ pipeline {
             steps {
                 echo 'Building the application...'
                 echo 'Using build tool: Maven'
-                archiveArtifacts artifacts: '**/build-logs/*.log', allowEmptyArchive: true
+                // Save all log files from a general log directory
+                archiveArtifacts artifacts: '*.log', allowEmptyArchive: true
             }
         }
         stage('Unit and Integration Tests') {
