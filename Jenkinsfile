@@ -5,18 +5,20 @@ pipeline {
             steps {
                 echo 'Building the application...'
                 echo 'Using build tool: Maven'
+                archiveArtifacts artifacts: '**/build-logs/*.log', allowEmptyArchive: true
             }
         }
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Running unit and integration tests...'
                 echo 'Using test tools: JUnit (Java), Mocha (Node.js)'
+                archiveArtifacts artifacts: '**/test-logs/*.log', allowEmptyArchive: true
             }
             post {
                 always {
                     emailext (
                         subject: "Unit and Integration Tests Results",
-                        body: "The unit and integration tests have completed. Check the attached logs for details.\n\n${BUILD_LOG, maxLines=100, escapeHtml=true}",
+                        body: "The unit and integration tests have completed. Check the attached logs for details.",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/test-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
@@ -35,12 +37,13 @@ pipeline {
             steps {
                 echo 'Performing security scan...'
                 echo 'Using security scan tool: Snyk'
+                archiveArtifacts artifacts: '**/security-logs/*.log', allowEmptyArchive: true
             }
             post {
                 always {
                     emailext (
                         subject: "Security Scan Results",
-                        body: "The security scan has completed. Check the attached logs for details.\n\n${BUILD_LOG, maxLines=100, escapeHtml=true}",
+                        body: "The security scan has completed. Check the attached logs for details.",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/security-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
@@ -80,7 +83,6 @@ pipeline {
         }
     }
 }
-
 
 
 
