@@ -20,7 +20,7 @@ pipeline {
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/test-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
-                        compressAttachments: true
+                        compressLog: true // Updated parameter
                     )
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/security-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
-                        compressAttachments: true
+                        compressLog: true // Updated parameter
                     )
                 }
             }
