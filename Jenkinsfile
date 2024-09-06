@@ -60,14 +60,20 @@ pipeline {
         }
     }
     post {
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed.'
-        }
-        always {
-            echo 'Cleaning up...'
-        }
+    success {
+        emailext (
+            subject: "Build Success",
+            body: "The build was successful.",
+            to: "your-email@example.com"
+        )
     }
+    failure {
+        emailext (
+            subject: "Build Failure",
+            body: "The build failed.",
+            to: "your-email@example.com"
+        )
+    }
+}
+
 }
