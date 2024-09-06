@@ -16,7 +16,7 @@ pipeline {
                 always {
                     emailext (
                         subject: "Unit and Integration Tests Results",
-                        body: "The unit and integration tests have completed. Check the attached logs for details.",
+                        body: "The unit and integration tests have completed. Check the attached logs for details.\n\n${BUILD_LOG, maxLines=100, escapeHtml=true}",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/test-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
@@ -40,7 +40,7 @@ pipeline {
                 always {
                     emailext (
                         subject: "Security Scan Results",
-                        body: "The security scan has completed. Check the attached logs for details.",
+                        body: "The security scan has completed. Check the attached logs for details.\n\n${BUILD_LOG, maxLines=100, escapeHtml=true}",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/security-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
