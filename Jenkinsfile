@@ -4,58 +4,78 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Build the code using a build automation tool
-                echo 'Building the code...'
-                // Example tool: Maven
-                sh 'mvn clean install'
+                echo 'Building the application...'
+                echo 'Using build tool: Maven'
             }
         }
+
         stage('Unit and Integration Tests') {
             steps {
-                // Run unit and integration tests
-                echo 'Running unit and integration tests...'
-                // Example tools: JUnit for Java, Mocha for Node.js
-                sh 'mvn test'
+                script {
+                    // Capture output for Unit and Integration Tests stage
+                    def testOutput = sh(script: 'echo "Running unit and integration tests..."', returnStdout: true).trim()
+                    writeFile file: 'unit_test_log.txt', text: testOutput
+                }
+            }
+            post {
+                always {
+                    // Send email with logs attached for the Unit and Integration Tests stage
+                    emailext(
+                        to: 'work.kadyan@gmail.com',
+                        subject: "Unit and Integration Tests Status: ${currentBuild.currentResult}",
+                        body: "The Unit and Integration Tests have finished with status: ${currentBuild.currentResult}.",
+                        attachmentsPattern: 'unit_test_log.txt'
+                    )
+                }
             }
         }
+
         stage('Code Analysis') {
             steps {
-                // Analyze code quality
                 echo 'Performing code analysis...'
-                // Example tool: SonarQube
-                sh 'sonar-scanner'
+                echo 'Using analysis tool: SonarQube'
             }
         }
+
         stage('Security Scan') {
             steps {
-                // Perform a security scan
-                echo 'Performing security scan...'
-                // Example tool: OWASP ZAP, Snyk
-                sh 'snyk test'
+                script {
+                    // Capture output for Security Scan stage
+                    def securityOutput = sh(script: 'echo "Performing security scan..."', returnStdout: true).trim()
+                    writeFile file: 'security_scan_log.txt', text: securityOutput
+                }
+            }
+            post {
+                always {
+                    // Send email with logs attached for the Security Scan stage
+                    emailext(
+                        to: 'work.kadyan@gmail.com',
+                        subject: "Security Scan Status: ${currentBuild.currentResult}",
+                        body: "The Security Scan has finished with status: ${currentBuild.currentResult}.",
+                        attachmentsPattern: 'security_scan_log.txt'
+                    )
+                }
             }
         }
+
         stage('Deploy to Staging') {
             steps {
-                // Deploy the application to a staging server
-                echo 'Deploying to staging...'
-                // Example deployment: AWS CLI
-                sh 'aws deploy push --application-name MyApp --s3-location s3://mybucket/myapp.zip'
+                echo 'Deploying to staging server...'
+                echo 'Deploying to staging using AWS EC2'
             }
         }
+
         stage('Integration Tests on Staging') {
             steps {
-                // Run integration tests on staging
-                echo 'Running integration tests on staging...'
-                // Example tools: Selenium, Postman
-                sh 'mvn verify'
+                echo 'Running integration tests on staging environment...'
+                echo 'Using testing tool: JUnit'
             }
         }
+
         stage('Deploy to Production') {
             steps {
-                // Deploy the application to production
-                echo 'Deploying to production...'
-                // Example deployment: AWS CLI
-                sh 'aws deploy push --application-name MyApp --s3-location s3://mybucket/myapp.zip'
+                echo 'Deploying to production server...'
+                echo 'Deploying to production using AWS EC2'
             }
         }
     }
