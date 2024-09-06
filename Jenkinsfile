@@ -22,7 +22,7 @@ pipeline {
                     archiveArtifacts artifacts: '**/test-logs/*.log', allowEmptyArchive: true
                     emailext (
                         subject: "Unit and Integration Tests Results: Job ${env.JOB_NAME}",
-                        body: "The unit and integration tests have completed. Check the attached logs for details.\n\nStatus: ${currentBuild.currentResult}\nLink: ${env.BUILD_URL}",
+                        body: "${currentBuild.currentResult}: Unit and integration tests have completed. Check the attached logs for details.\n\nBuild URL: ${env.BUILD_URL}",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/test-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
@@ -49,7 +49,7 @@ pipeline {
                     archiveArtifacts artifacts: '**/security-logs/*.log', allowEmptyArchive: true
                     emailext (
                         subject: "Security Scan Results: Job ${env.JOB_NAME}",
-                        body: "The security scan has completed. Check the attached logs for details.\n\nStatus: ${currentBuild.currentResult}\nLink: ${env.BUILD_URL}",
+                        body: "${currentBuild.currentResult}: Security scan has completed. Check the attached logs for details.\n\nBuild URL: ${env.BUILD_URL}",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: '**/security-logs/*.log',
                         replyTo: "work.kadyan@gmail.com",
@@ -86,6 +86,7 @@ pipeline {
         }
     }
 }
+
 
 
 
