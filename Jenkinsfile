@@ -1,105 +1,82 @@
 pipeline {
     agent any
-
-    environment {
-        EMAIL_RECIPIENT = 'recipient@example.com' // Set the recipient email address here
-    }
-
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                // Add build steps here
+                echo 'Using build tool: Maven'
             }
         }
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Running unit and integration tests...'
-                // Add test steps here
+                echo 'Using test tools: JUnit (Java), Mocha (Node.js)'
             }
             post {
                 always {
-                    script {
-                        def testLogs = findFiles(glob: 'test-logs/*.log')
-                        if (testLogs) {
-                            emailext (
-                                to: "${EMAIL_RECIPIENT}",
-                                subject: "Unit and Integration Tests Status - ${currentBuild.currentResult}",
-                                body: "The unit and integration tests have ${currentBuild.currentResult}. Please find the attached logs.",
-                                attachmentsPattern: 'test-logs/*.log'
-                            )
-                        } else {
-                            emailext (
-                                to: "${EMAIL_RECIPIENT}",
-                                subject: "Unit and Integration Tests Status - ${currentBuild.currentResult}",
-                                body: "The unit and integration tests have ${currentBuild.currentResult}. No log files were found."
-                            )
-                        }
-                    }
+                    emailext (
+                        subject: "Unit and Integration Tests Results",
+                        body: "The unit and integration tests have completed. Check the attached logs for details.",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/test-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressLog: true // Updated parameter
+                    )
                 }
             }
         }
         stage('Code Analysis') {
             steps {
                 echo 'Performing code analysis...'
-                // Add code analysis steps here
+                echo 'Using code analysis tool: SonarQube'
             }
         }
         stage('Security Scan') {
             steps {
                 echo 'Performing security scan...'
-                // Add security scan steps here
+                echo 'Using security scan tool: Snyk'
             }
             post {
                 always {
-                    script {
-                        def securityLogs = findFiles(glob: 'security-logs/*.log')
-                        if (securityLogs) {
-                            emailext (
-                                to: "${EMAIL_RECIPIENT}",
-                                subject: "Security Scan Status - ${currentBuild.currentResult}",
-                                body: "The security scan has ${currentBuild.currentResult}. Please find the attached logs.",
-                                attachmentsPattern: 'security-logs/*.log'
-                            )
-                        } else {
-                            emailext (
-                                to: "${EMAIL_RECIPIENT}",
-                                subject: "Security Scan Status - ${currentBuild.currentResult}",
-                                body: "The security scan has ${currentBuild.currentResult}. No log files were found."
-                            )
-                        }
-                    }
+                    emailext (
+                        subject: "Security Scan Results",
+                        body: "The security scan has completed. Check the attached logs for details.",
+                        to: "work.kadyan@gmail.com",
+                        attachmentsPattern: '**/security-logs/*.log',
+                        replyTo: "work.kadyan@gmail.com",
+                        compressLog: true // Updated parameter
+                    )
                 }
             }
         }
         stage('Deploy to Staging') {
             steps {
                 echo 'Deploying to staging environment...'
-                // Add deployment steps here
+                echo 'Using deployment tool: AWS CLI'
             }
         }
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Running integration tests on staging environment...'
-                // Add integration tests steps here
+                echo 'Using test tools: Selenium, Postman'
             }
         }
         stage('Deploy to Production') {
             steps {
                 echo 'Deploying to production environment...'
-                // Add deployment steps here
+                echo 'Using deployment tool: AWS CLI'
             }
         }
     }
-
     post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
         always {
-            echo 'Pipeline completed.'
+            echo 'Cleaning up...'
         }
     }
 }
