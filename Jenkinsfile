@@ -32,18 +32,22 @@ pipeline {
             post {
                 always {
                     script {
-                        def logFiles = sh(script: 'ls -1 test-logs/*.log', returnStdout: true).trim()
-                        if (logFiles) {
-                            emailext (
-                                subject: "Unit and Integration Tests Results",
-                                body: "The unit and integration tests have completed. Check the attached logs for details.",
-                                to: EMAIL_RECIPIENT,
-                                attachmentsPattern: 'test-logs/*.log',
-                                replyTo: EMAIL_RECIPIENT,
-                                compressLog: true
-                            )
-                        } else {
-                            echo 'No test log files found for attachment.'
+                        try {
+                            def logFiles = sh(script: 'ls -1 test-logs/*.log || true', returnStdout: true).trim()
+                            if (logFiles) {
+                                emailext (
+                                    subject: "Unit and Integration Tests Results",
+                                    body: "The unit and integration tests have completed. Check the attached logs for details.",
+                                    to: EMAIL_RECIPIENT,
+                                    attachmentsPattern: 'test-logs/*.log',
+                                    replyTo: EMAIL_RECIPIENT,
+                                    compressLog: true
+                                )
+                            } else {
+                                echo 'No test log files found for attachment.'
+                            }
+                        } catch (Exception e) {
+                            echo "Error handling log files: ${e.message}"
                         }
                     }
                 }
@@ -69,18 +73,22 @@ pipeline {
             post {
                 always {
                     script {
-                        def logFiles = sh(script: 'ls -1 security-logs/*.log', returnStdout: true).trim()
-                        if (logFiles) {
-                            emailext (
-                                subject: "Security Scan Results",
-                                body: "The security scan has completed. Check the attached logs for details.",
-                                to: EMAIL_RECIPIENT,
-                                attachmentsPattern: 'security-logs/*.log',
-                                replyTo: EMAIL_RECIPIENT,
-                                compressLog: true
-                            )
-                        } else {
-                            echo 'No security scan log files found for attachment.'
+                        try {
+                            def logFiles = sh(script: 'ls -1 security-logs/*.log || true', returnStdout: true).trim()
+                            if (logFiles) {
+                                emailext (
+                                    subject: "Security Scan Results",
+                                    body: "The security scan has completed. Check the attached logs for details.",
+                                    to: EMAIL_RECIPIENT,
+                                    attachmentsPattern: 'security-logs/*.log',
+                                    replyTo: EMAIL_RECIPIENT,
+                                    compressLog: true
+                                )
+                            } else {
+                                echo 'No security scan log files found for attachment.'
+                            }
+                        } catch (Exception e) {
+                            echo "Error handling security scan logs: ${e.message}"
                         }
                     }
                 }
@@ -121,6 +129,7 @@ pipeline {
         }
     }
 }
+
 
 
 
