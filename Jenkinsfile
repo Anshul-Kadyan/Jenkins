@@ -24,7 +24,7 @@ pipeline {
                     }
                     emailext(
                         subject: "Unit and Integration Tests Report: ${currentBuild.currentResult} - Job ${env.JOB_NAME}",
-                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nLink: ${env.BUILD_URL}",
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nUnit and Integration Tests results attached.",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: 'unit_integration_tests_report.txt',
                         replyTo: "work.kadyan@gmail.com",
@@ -53,7 +53,7 @@ pipeline {
                     }
                     emailext(
                         subject: "Security Scan Report: ${currentBuild.currentResult} - Job ${env.JOB_NAME}",
-                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nLink: ${env.BUILD_URL}",
+                        body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n\nSecurity Scan results attached.",
                         to: "work.kadyan@gmail.com",
                         attachmentsPattern: 'security_scan_report.txt',
                         replyTo: "work.kadyan@gmail.com",
